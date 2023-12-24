@@ -2,7 +2,7 @@
 {% set cuda_major = (cuda_compiler_version|default("0.0")).split(".")[0] %}
 {% set version = "0.0.9" %}
 {% set commit = "e3c9730ee0de2fe43191c0efacce097c914e1af4" %}
-{% set build = 2 %}
+{% set build = 3 %}
 
 package:
   name: {{ name|lower }}
