@@ -2,7 +2,7 @@
 {% set cuda_major = (cuda_compiler_version|default("0.0")).split(".")[0] %}
 {% set version = "0.0.9" %}
 {% set commit = "e3c9730ee0de2fe43191c0efacce097c914e1af4" %}
-{% set build = 3 %}
+{% set build = 4 %}
 
 package:
   name: {{ name|lower }}
@@ -32,15 +32,19 @@ build:
     - "*/_hmp.*"        # [win]
     - "*/libcuda.so.1"  # [linux]
   script_env:
-    - BMF_BUILD_ENABLE_CUDA=OFF  # [cuda_compiler_version == "None"]
-    - BMF_BUILD_ENABLE_CUDA=ON   # [cuda_compiler_version != "None"]
-    - GIT_SHA="{{ commit }}"
+    - BMF_BUILD_ENABLE_CUDA=OFF                          # [cuda_compiler_version == "None"]
+    - BMF_BUILD_ENABLE_CUDA=ON                           # [cuda_compiler_version != "None"]
+    - CUDA_COMPILER_VERSION={{ cuda_compiler_version }}  # [cuda_compiler_version != "None"]
+    - GIT_SHA={{ commit }}
 
 requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - {{ compiler('cuda') }}   # [cuda_compiler_version != "None"]
+    - {{ compiler('cuda') }}              # [cuda_compiler_version != "None"]
+    - python                              # [build_platform != target_platform]
+    - cross-python_{{ target_platform }}  # [build_platform != target_platform]
+    - pybind11                            # [build_platform != target_platform]
     - cmake
     - ninja
     - pkg-config

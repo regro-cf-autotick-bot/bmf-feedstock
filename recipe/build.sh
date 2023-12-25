@@ -1,7 +1,32 @@
 set -x
 
+if [[ "${target_platform}" != "${build_platform}" ]]; then
+    # PyBind11 will find python3.X which returns a different
+    # value for the "EXT_SUFFIX" which is inconsistent with
+    # cross compilation
+    # https://github.com/conda-forge/cross-python-feedstock/issues/75
+    Python_EXECUTABLE=${BUILD_PREFIX}/bin/python
+else
+    Python_EXECUTABLE=${PYTHON}
+fi
+
+# Exclude Jetson architectures for non-ARM platform, because we know they will never be utilized.
+if [[ "$target_platform" == linux-aarch64 ]]; then
+    CUDA_ARCHS_LIST=all
+elif [[ "$target_platform" == linux-ppc64le ]]; then
+    CUDA_ARCHS_LIST="60-real;70"
+elif [[ "$CUDA_COMPILER_VERSION" == "11.2" ]]; then
+    CUDA_ARCHS_LIST="35-real;37-real;50-real;52-real;60-real;61-real;70-real;75-real;80-real;86"
+elif [[ "$CUDA_COMPILER_VERSION" == "11.8" ]]; then
+    CUDA_ARCHS_LIST="35-real;37-real;50-real;52-real;60-real;61-real;70-real;75-real;80-real;86-real;90"
+elif [[ "$CUDA_COMPILER_VERSION" == "12.0" ]]; then
+    CUDA_ARCHS_LIST="50-real;52-real;60-real;61-real;70-real;75-real;80-real;86-real;90"
+else
+    CUDA_ARCHS_LIST=all
+fi
+
 export CMAKE_GENERATOR=Ninja
-export CMAKE_ARGS="${CMAKE_ARGS} -DBMF_LOCAL_DEPENDENCIES=OFF -DBMF_ENABLE_CUDA=${BMF_BUILD_ENABLE_CUDA}"
+export CMAKE_ARGS="${CMAKE_ARGS} -DBMF_LOCAL_DEPENDENCIES=OFF -DBMF_ENABLE_CUDA=${BMF_BUILD_ENABLE_CUDA} -DPython_EXECUTABLE=${Python_EXECUTABLE} -DHMP_CUDA_ARCH_FLAGS=${CUDA_ARCHS_LIST}"
 "$PYTHON" -m pip install -v .
 
 cd $PREFIX/lib/python${PY_VER}/site-packages/bmf
