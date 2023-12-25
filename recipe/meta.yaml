@@ -50,8 +50,8 @@ requirements:
   host:
     - cuda-version  {{ cuda_compiler_version }}  # [cuda_compiler_version != "None"]
     {% if cuda_major == "12" %}
-    - cuda-cudart-dev                            # [cuda_compiler_version != "None"]
-    - cuda-compat                                # [linux and cuda_compiler_version != "None"]
+    - cuda-cudart-dev
+    - cuda-compat                                # [linux]
     {% else %}
     - cudatoolkit                                # [cuda_compiler_version != "None"]
     {% endif %}
@@ -81,7 +81,9 @@ test:
   requires:
     - pip
     # To provide the CUDA driver library
-    - cuda-compat  # [linux and cuda_major == "12"]
+    {% if cuda_major == "12" %}
+    - cuda-compat  # [linux]
+    {% endif %}
   imports:
     - bmf
   files:

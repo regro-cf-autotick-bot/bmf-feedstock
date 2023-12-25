@@ -42,4 +42,7 @@ else
     for i in $(ls $PREFIX/lib/libhmp*); do
         patchelf --add-rpath $PREFIX/cuda-compat $i
     done
+    for i in $(ls $PREFIX/lib/libbuiltin_modules*); do
+        patchelf --add-rpath $PREFIX/cuda-compat $i
+    done
 fi
