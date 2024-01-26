@@ -1,7 +1,7 @@
 {% set name = "bmf" %}
 {% set cuda_major = (cuda_compiler_version|default("0.0")).split(".")[0] %}
 {% set version = "0.0.10" %}
-{% set commit = "e3c9730ee0de2fe43191c0efacce097c914e1af4" %}
+{% set commit = "c721b0d9b344823d57b4c8363badcd1b258e4b63" %}
 {% set build = 0 %}
 
 package:
