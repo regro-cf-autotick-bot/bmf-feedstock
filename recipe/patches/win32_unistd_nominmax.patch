@@ -1,0 +1,12 @@
+diff --git a/x64/usr/include/unistd.h b/x64/usr/include/unistd.h
+index 4440b66..a25e298 100644
+--- a/x64/usr/include/unistd.h
++++ b/x64/usr/include/unistd.h
+@@ -1,6 +1,7 @@
+ #ifndef _UNISTD_H
+ #define _UNISTD_H
+ 
++#define NOMINMAX
+ #include <io.h>
+ #include <process.h>
+ #include <windows.h>

@@ -2,26 +2,36 @@
 {% set cuda_major = (cuda_compiler_version|default("0.0")).split(".")[0] %}
 {% set version = "0.0.10" %}
 {% set commit = "c721b0d9b344823d57b4c8363badcd1b258e4b63" %}
-{% set build = 0 %}
+{% set build = 1 %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://github.com/BabitMF/bmf/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 9d24fc909a626730518dc8f9f4dc02d76345ea38445166b116b3f10ef9adb691
-  patches:
-    # we don't need the python command wrapper
-    - patches/dont_install_commands.patch
-    # make standard requirement optional to build with CUDA 11
-    - patches/Make_CMake_standard_requirement_optional.patch
-    # Windows library are under binary dir
-    - patches/search_library_in_binary_dir.patch  # [win]
+  - url: https://github.com/BabitMF/bmf/archive/refs/tags/v{{ version }}.tar.gz
+    sha256: 9d24fc909a626730518dc8f9f4dc02d76345ea38445166b116b3f10ef9adb691
+    patches:
+      # we don't need the python command wrapper
+      - patches/dont_install_commands.patch
+      # make standard requirement optional to build with CUDA 11
+      - patches/Make_CMake_standard_requirement_optional.patch
+      # Dispatch case uses constexpr
+      - patches/dispatch_case_constexpr_fix.patch
+      # Windows library are under binary dir
+      - patches/search_library_in_binary_dir.patch  # [win]
+  - url: https://github.com/BabitMF/bmf/releases/download/files/win_rootfs.tar.gz  # [win]
+    sha256: 6ab8e8df127c5d54b6c64f9ae4f4680f012f0b3b916e4f003e00963399580367  # [win]
+    folder: win_rootfs  # [win]
+    patches:  # [win]
+      # don't let windows.h define MIN and MAX macro
+      - patches/win32_unistd_nominmax.patch  # [win]
 
 build:
   number: {{ build }}
-  skip: true  # [win]
+  {% if cuda_major == "11" %}
+  skip: True  # [linux and (aarch64 or ppc64le)]
+  {% endif %}
   string: cuda{{ cuda_compiler_version | replace('.', '') }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != "None"]
   string: cpu_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version == "None"]
   ignore_run_exports:
@@ -89,11 +99,15 @@ test:
     - cuda-compat  # [linux]
     {% endif %}
   imports:
-    - bmf
+    # CUDA version cannot be tested here because we haven't planted our nvcuda.dll stub library.
+    - bmf  # [cuda_compiler_version == "None"]
   files:
     - api_test.py
     - test_graph.json
+    # Stub library. See nvcuda_stub.cpp for source.
+    - nvcuda.dll  # [win and cuda_compiler_version != "None"]
   commands:
+    - COPY nvcuda.dll %LIBRARY_BIN%\nvcuda.dll  # [win and cuda_compiler_version != "None"]
     - pip check
     - module_manager list
     - module_manager dump c_ffmpeg_decoder
