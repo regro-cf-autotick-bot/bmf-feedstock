@@ -2,7 +2,7 @@
 {% set cuda_major = (cuda_compiler_version|default("0.0")).split(".")[0] %}
 {% set version = "0.0.10" %}
 {% set commit = "c721b0d9b344823d57b4c8363badcd1b258e4b63" %}
-{% set build = 2 %}
+{% set build = 3 %}
 
 package:
   name: {{ name|lower }}
@@ -50,6 +50,7 @@ build:
 requirements:
   build:
     - {{ compiler('c') }}
+    - {{ stdlib("c") }}
     - {{ compiler('cxx') }}
     - {{ compiler('cuda') }}              # [cuda_compiler_version != "None"]
     - python                              # [build_platform != target_platform]
@@ -89,7 +90,6 @@ requirements:
     - ucrt      # [win]
     - python
     - ncurses   # [unix]
-    - __osx  >={{ MACOSX_DEPLOYMENT_TARGET|default("10.9") }}  # [osx and x86_64]
 
 test:
   requires:
