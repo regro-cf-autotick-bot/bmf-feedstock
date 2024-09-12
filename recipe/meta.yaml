@@ -15,9 +15,9 @@ source:
       # we don't need the python command wrapper
       - patches/dont_install_commands.patch
       # make standard requirement optional to build with CUDA 11
-      - patches/Make_CMake_standard_requirement_optional.patch
+      - patches/relax_cxx_standard_requirement.patch
       # Dispatch case uses constexpr
-      - patches/dispatch_case_constexpr_fix.patch
+      - patches/msvc_use_conformance_lambda.patch  # [win]
       # Windows library are under binary dir
       - patches/search_library_in_binary_dir.patch  # [win]
   - url: https://github.com/BabitMF/bmf/releases/download/files/win_rootfs.tar.gz  # [win]
