@@ -83,6 +83,7 @@ requirements:
     - numpy
     - pip
     - python
+    - setuptools
     - ncurses               # [unix]
     - dlfcn-win32  >=1.4.1  # [win]
   run:
