@@ -1,6 +1,6 @@
 {% set name = "bmf" %}
 {% set cuda_major = (cuda_compiler_version|default("0.0")).split(".")[0] %}
-{% set version = "0.0.11" %}
+{% set version = "0.0.12" %}
 {% set commit = "10fde57672d125cf3a5eac7d9b30b924e4603d28" %}
 {% set build = 0 %}
 
@@ -10,7 +10,7 @@ package:
 
 source:
   - url: https://github.com/BabitMF/bmf/archive/refs/tags/v{{ version }}.tar.gz
-    sha256: 1dde6b10c506d77dea39fc3eb18a6566c960c0fc6366578c836ba54ab92422fd
+    sha256: baf16c61aebfc5a494c00697e99a84788fba586d2809499f019a6107eb4b6218
     patches:
       # we don't need the python command wrapper
       - patches/dont_install_commands.patch
